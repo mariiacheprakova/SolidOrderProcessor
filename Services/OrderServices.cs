@@ -1,17 +1,6 @@
 ﻿using SolidOrderProcessor.Models;
-using System;
 
-class Program
-{
-    public static void Main(string[] args)
-    {
-
-    }
-}
-
-
-
-
+namespace SolidOrderProcessor.Services;
 
 public class OrderService
 {
@@ -19,16 +8,21 @@ public class OrderService
     {
         // Validation
         if (order == null)
+        {
             throw new Exception("Order is null");
+        }
 
         if (order.Total <= 0)
+        {
             throw new Exception("Invalid total");
+        }
+
         // Payment
-        if (order.PaymentMethod == "CreditCard")
+        if (order.PaymentMethod == PaymentMethod.CreditCard)
         {
             Console.WriteLine("Paid with credit card");
         }
-        else if (order.PaymentMethod == "PayPal")
+        else if (order.PaymentMethod == PaymentMethod.PayPal)
         {
             Console.WriteLine("Paid with PayPal");
         }
@@ -36,19 +30,16 @@ public class OrderService
         {
             throw new Exception("Unknown payment method");
         }
+
         // Notification
         if (order.CustomerEmail != null)
         {
             Console.WriteLine($"Email sent to {order.CustomerEmail}");
         }
+
         // Persistence
-        File.AppendAllText("orders.txt", order.Id + Environment.NewLine);
+        File.AppendAllText(
+            "orders.txt",
+            order.Id + Environment.NewLine);
     }
-}
-public class Order
-{
-    public int Id { get; set; }
-    public decimal Total { get; set; }
-    public PaymentMethod PaymentMethod { get; set; }
-    public string? CustomerEmail { get; set; }
 }
