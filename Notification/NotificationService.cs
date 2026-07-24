@@ -1,18 +1,23 @@
 ﻿using SolidOrderProcessor.Models;
-
+using SolidOrderProcessor.Persistence;
 namespace SolidOrderProcessor.Notification;
 
 public class NotificationService : ISendEmail
 {
+    private readonly ILogger _logger;
+    public NotificationService(ILogger logger)
+    {
+        _logger = logger;
+    }
     public void SendingEmailToCustomer(Order order)
     {
         if (order.CustomerEmail is not null)
         {
-            Console.WriteLine($"Email sent to {order.CustomerEmail}");
+            _logger.Log($"Email sent to {order.CustomerEmail}");
         }
         else
         {
-            Console.WriteLine("Customer has no email.");
+            _logger.Log("Customer has no email.");
         }
     }
 }
