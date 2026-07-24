@@ -1,12 +1,14 @@
-﻿using SolidOrderProcessor.Models;
-using SolidOrderProcessor.Persistence;
+﻿using SolidOrderProcessor.Logging;
+using SolidOrderProcessor.Models;
 namespace SolidOrderProcessor.Payments;
 
 
-public class PayPalProcessor : IPaymentProcessor
+public class PayPalPayment : IPaymentStrategy
 {
     private readonly ILogger _logger;
-    public PayPalProcessor(ILogger logger)
+    private ConsoleLogger logger;
+
+    public PayPalPayment(ILogger logger)
     {
         _logger = logger;
     }

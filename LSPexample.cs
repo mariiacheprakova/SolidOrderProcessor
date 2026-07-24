@@ -1,4 +1,4 @@
-﻿using SolidOrderProcessor.Persistence;
+﻿using SolidOrderProcessor.Logging;
 using System;
 using System.Collections.Generic;
 using System.Text;

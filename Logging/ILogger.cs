@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace SolidOrderProcessor.Persistence;
+namespace SolidOrderProcessor.Logging;
 
 public interface ILogger
 {

@@ -1,11 +1,11 @@
 ﻿using SolidOrderProcessor.Models;
-using SolidOrderProcessor.Persistence;
+using SolidOrderProcessor.Logging;
 namespace SolidOrderProcessor.Payments;
 
-public class CreditCardProcessor : IPaymentProcessor
+public class CreditCardPayment : IPaymentStrategy
 {
     private readonly ILogger _logger;
-    public CreditCardProcessor(ILogger logger)
+    public CreditCardPayment(ILogger logger)
     {
         _logger = logger;
     }

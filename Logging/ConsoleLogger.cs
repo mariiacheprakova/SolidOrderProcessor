@@ -1,11 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
+﻿
+using SolidOrderProcessor.Configuration;
 
-namespace SolidOrderProcessor.Persistence;
+namespace SolidOrderProcessor.Logging;
 
 public class ConsoleLogger : ILogger
 {
-    public void Log(string message) => Console.WriteLine(message);
+    public void Log(string message)
+    {
+        if (AppSettings.Instance.EnablePaymentLogging)
+        {
+            Console.WriteLine(message);
+        }
+    }
 }

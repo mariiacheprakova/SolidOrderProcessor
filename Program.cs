@@ -5,22 +5,24 @@ using SolidOrderProcessor.Payments;
 using SolidOrderProcessor.Persistence;
 using SolidOrderProcessor.Services;
 using SolidOrderProcessor.Validation;
+using SolidOrderProcessor.Logging;
 
-ILogger logger = new ConsoleLogger();
 
-IOrderValidator validator = new OrderValidation();
-ISendEmail notificationService = new NotificationService(logger);
-IOrderRepository repository = new FileOrderRepository();
+var logger = new ConsoleLogger();
 
-IEnumerable<IPaymentProcessor> processors =
+var validator = new OrderValidation();
+var notificationService = new NotificationService(logger);
+var repository = new FileOrderRepository();
+
+IEnumerable<IPaymentStrategy> strategies =
 [
-    new CreditCardProcessor(logger),
-    new PayPalProcessor(logger)
+    new CreditCardPayment(logger),
+    new PayPalPayment(logger)
 ];
 
-PaymentService paymentService = new PaymentService(processors);
+var paymentService = new PaymentService(strategies);
 
-OrderService orderService = new OrderService(
+var orderService = new OrderService(
     notificationService,
     repository,
     paymentService,

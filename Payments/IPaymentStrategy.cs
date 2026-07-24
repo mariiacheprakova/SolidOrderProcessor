@@ -2,9 +2,9 @@
 using SolidOrderProcessor.Models;
 namespace SolidOrderProcessor.Payments;
 
-public interface IPaymentProcessor
+public interface IPaymentStrategy
 {
     PaymentMethod SupportedMethod { get; }
-    void ProcessingPayment(Order order);
+    public void ProcessingPayment(Order order);
 }
 

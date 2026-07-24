@@ -1,23 +1,23 @@
 ﻿using SolidOrderProcessor.Models;
-
+using SolidOrderProcessor.Logging;
 namespace SolidOrderProcessor.Payments;
 
 public class PaymentService
 {
-    private readonly IEnumerable<IPaymentProcessor> _paymentProcessors;
+    private readonly IEnumerable<IPaymentStrategy> _strategies;
 
-    public PaymentService(IEnumerable<IPaymentProcessor> paymentProcessors)
+    public PaymentService(IEnumerable<IPaymentStrategy> strategies)
     {
-        _paymentProcessors = paymentProcessors;
+        _strategies = strategies;
     }
 
     public void ProcessPayment(Order order)
     {
-        IPaymentProcessor processor = _paymentProcessors.FirstOrDefault(
-            processor => processor.SupportedMethod == order.PaymentMethod)
+        IPaymentStrategy strategy = _strategies.FirstOrDefault(
+           payment => payment.SupportedMethod == order.PaymentMethod)
             ?? throw new InvalidOperationException(
-                "Unsupported payment method.");
+                $"No strategy found for {order.PaymentMethod}.");
 
-        processor.ProcessingPayment(order);
+        strategy.ProcessingPayment(order);
     }
 }
