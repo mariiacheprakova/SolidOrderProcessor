@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace SolidOrderProcessor.Services
+namespace SolidOrderProcessor.Services;
+
+public interface IProcessOrder
 {
-    internal class IProcessOrder
-    {
-    }
+
 }

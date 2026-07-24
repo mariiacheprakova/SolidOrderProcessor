@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace SolidOrderProcessor.Persistence
+namespace SolidOrderProcessor.Persistence;
+
+public interface ILogger
 {
-    internal class AppendingText
-    {
-    }
+    void Log(string message);
 }

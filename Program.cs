@@ -1,54 +1,36 @@
 ﻿using SolidOrderProcessor.Models;
-using System;
+using SolidOrderProcessor.Notification;
+using SolidOrderProcessor.Payments;
+using SolidOrderProcessor.Persistence;
+using SolidOrderProcessor.Services;
+using SolidOrderProcessor.Validation;
 
-class Program
+ILogger logger = new ConsoleLogger();
+
+IOrderValidator validator = new OrderValidation();
+ISendEmail notificationService = new NotificationService();
+IOrderRepository repository = new FileOrderRepository();
+
+IEnumerable<IPaymentProcessor> processors =
+[
+    new CreditCardProcessor(logger),
+    new PayPalProcessor(logger)
+];
+
+PaymentService paymentService = new PaymentService(processors);
+
+OrderService orderService = new OrderService(
+    notificationService,
+    repository,
+    paymentService,
+    validator);
+
+Order order = new Order
 {
-    public static void Main(string[] args)
-    {
+    Id = 1,
+    Total = 100,
+    CustomerEmail = "customer@example.com",
+    PaymentMethod = PaymentMethod.PayPal
+};
 
-    }
-}
-
-
-
-
-
-public class OrderService
-{
-    public void ProcessOrder(Order order)
-    {
-        // Validation
-        if (order == null)
-            throw new Exception("Order is null");
-
-        if (order.Total <= 0)
-            throw new Exception("Invalid total");
-        // Payment
-        if (order.PaymentMethod == "CreditCard")
-        {
-            Console.WriteLine("Paid with credit card");
-        }
-        else if (order.PaymentMethod == "PayPal")
-        {
-            Console.WriteLine("Paid with PayPal");
-        }
-        else
-        {
-            throw new Exception("Unknown payment method");
-        }
-        // Notification
-        if (order.CustomerEmail != null)
-        {
-            Console.WriteLine($"Email sent to {order.CustomerEmail}");
-        }
-        // Persistence
-        File.AppendAllText("orders.txt", order.Id + Environment.NewLine);
-    }
-}
-public class Order
-{
-    public int Id { get; set; }
-    public decimal Total { get; set; }
-    public PaymentMethod PaymentMethod { get; set; }
-    public string? CustomerEmail { get; set; }
-}
+orderService.ProcessOrder(order);

@@ -1,23 +1,23 @@
-﻿
-using SolidOrderProcessor.Models;
+﻿using SolidOrderProcessor.Models;
 
 namespace SolidOrderProcessor.Payments;
 
-    public class ProcessPayment 
-    {
-    public void ProcessingPayment(Order order)
-    {
-        IPaymentProcessor processor = order.PaymentMethod switch
-        {
-            PaymentMethod.PayPal => new PayPalProcessor(),
-            PaymentMethod.CreditCard => new CreditCardProcessor(),
-            _ => throw new InvalidOperationException()
-        };
+public class PaymentService
+{
+    private readonly IEnumerable<IPaymentProcessor> _paymentProcessors;
 
-        processor.PaymentMethod(order);
-         
+    public PaymentService(IEnumerable<IPaymentProcessor> paymentProcessors)
+    {
+        _paymentProcessors = paymentProcessors;
     }
 
-        
-    }
+    public void ProcessPayment(Order order)
+    {
+        IPaymentProcessor processor = _paymentProcessors.FirstOrDefault(
+            processor => processor.SupportedMethod == order.PaymentMethod)
+            ?? throw new InvalidOperationException(
+                "Unsupported payment method.");
 
+        processor.ProcessingPayment(order);
+    }
+}

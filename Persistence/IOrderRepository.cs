@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using SolidOrderProcessor.Models;
 
-namespace SolidOrderProcessor.Persistence
+namespace SolidOrderProcessor.Persistence;
+
+public interface IOrderRepository
 {
-    internal class ISaveToFile
-    {
-    }
+    public void Save(Order order);
 }

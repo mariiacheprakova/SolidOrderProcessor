@@ -1,7 +1,17 @@
-﻿namespace SolidOrderProcessor.Payments;
+﻿using SolidOrderProcessor.Models;
+using SolidOrderProcessor.Persistence;
+namespace SolidOrderProcessor.Payments;
 
-    public class PayPalProcessor : IPaymentProcessor
+
+public class PayPalProcessor : IPaymentProcessor
+{
+    private readonly ILogger _logger;
+    public PayPalProcessor(ILogger logger)
     {
-    public void PaymentMethod(Order order) => Console.WriteLine("Paid with PayPal");
+        _logger = logger;
     }
+
+    public PaymentMethod SupportedMethod => PaymentMethod.PayPal;
+    public void ProcessingPayment(Order order) => _logger.Log("Paid with PayPal");
+}
 
