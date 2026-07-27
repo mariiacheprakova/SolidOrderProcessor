@@ -14,10 +14,10 @@ public class PaymentService
     public void ProcessPayment(Order order)
     {
         IPaymentStrategy strategy = _strategies.FirstOrDefault(
-           payment => payment.SupportedMethod == order.PaymentMethod)
+           payment => payment.SupportedPaymentMethod == order.PaymentMethod)
             ?? throw new InvalidOperationException(
                 $"No strategy found for {order.PaymentMethod}.");
 
-        strategy.ProcessingPayment(order);
+        strategy.Pay(order);
     }
 }

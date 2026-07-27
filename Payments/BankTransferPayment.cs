@@ -8,10 +8,11 @@ namespace SolidOrderProcessor.Payments;
 
 public class BankTransferPayment : IPaymentStrategy
 {
+    
     private readonly ILogger _logger;
     public BankTransferPayment(ILogger logger) => _logger = logger;
-    public PaymentMethod SupportedMethod => PaymentMethod.BankTransfer;
-    public void ProcessingPayment(Order order) => _logger.Log("Paid using bank transfer");
+    public PaymentMethod SupportedPaymentMethod => PaymentMethod.BankTransfer;
+    public void Pay(Order order) => _logger.Log("Paid using bank transfer.");
 
 }
 

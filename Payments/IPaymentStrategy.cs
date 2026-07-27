@@ -4,7 +4,7 @@ namespace SolidOrderProcessor.Payments;
 
 public interface IPaymentStrategy
 {
-    PaymentMethod SupportedMethod { get; }
-    public void ProcessingPayment(Order order);
+    PaymentMethod SupportedPaymentMethod { get; }
+    public void Pay(Order order);
 }
 

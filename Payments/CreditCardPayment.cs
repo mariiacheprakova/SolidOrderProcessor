@@ -9,8 +9,8 @@ public class CreditCardPayment : IPaymentStrategy
     {
         _logger = logger;
     }
-    public PaymentMethod SupportedMethod => PaymentMethod.CreditCard;
-    public void ProcessingPayment(Order order) => _logger.Log("Paid with credit card");
+    public PaymentMethod SupportedPaymentMethod => PaymentMethod.CreditCard;
+    public void Pay(Order order) => _logger.Log("Paid with credit card");
 
 }
 
