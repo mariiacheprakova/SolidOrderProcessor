@@ -21,9 +21,9 @@ public class OrderFacade
     }
    
 
-    public void PlaceOrder(Order order)
+    public async Task PlaceOrder(Order order)
     {
-        _orderService.ProcessOrder(order);
+        await _orderService.ProcessOrder(order);
         _orderEventPublisher.PublishOrderPlaced(order);
     }
 }

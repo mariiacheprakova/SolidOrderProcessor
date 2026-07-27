@@ -8,4 +8,5 @@ namespace SolidOrderProcessor.Payments;
 public interface IPaymentStrategyFactory
 {
     IPaymentStrategy Create(PaymentMethod paymentMethod);
+    
 }

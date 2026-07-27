@@ -1,23 +1,16 @@
 ﻿using SolidOrderProcessor.Models;
 using SolidOrderProcessor.Logging;
 namespace SolidOrderProcessor.Payments;
+using SolidOrderProcessor.Models;
 
-public class PaymentService
+public class PaymentService 
 {
-    private readonly IEnumerable<IPaymentStrategy> _strategies;
-
-    public PaymentService(IEnumerable<IPaymentStrategy> strategies)
-    {
-        _strategies = strategies;
-    }
-
+    private readonly IPaymentStrategyFactory _factory;
+    public PaymentService(IPaymentStrategyFactory factory) => _factory = factory;
     public void ProcessPayment(Order order)
     {
-        IPaymentStrategy strategy = _strategies.FirstOrDefault(
-           payment => payment.SupportedPaymentMethod == order.PaymentMethod)
-            ?? throw new InvalidOperationException(
-                $"No strategy found for {order.PaymentMethod}.");
-
+        IPaymentStrategy strategy = _factory.Create(order.PaymentMethod);
         strategy.Pay(order);
     }
+
 }

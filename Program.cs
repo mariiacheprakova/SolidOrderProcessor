@@ -5,6 +5,7 @@ using SolidOrderProcessor.Logging;
 using SolidOrderProcessor.Models;
 using SolidOrderProcessor.Notification;
 using SolidOrderProcessor.Observers;
+using SolidOrderProcessor.Payment;
 using SolidOrderProcessor.Payments;
 using SolidOrderProcessor.Persistence;
 using SolidOrderProcessor.Services;
@@ -17,42 +18,28 @@ var validator = new OrderValidation();
 var notificationService = new NotificationService(logger);
 var repository = new FileOrderRepository();
 
-IPaymentStrategy creditCardStrategy =
-    new CreditCardPayment(logger);
-
-IPaymentStrategy payPalStrategy =
-    new PayPalPayment(logger);
-
-IPaymentStrategy bankTransferStrategy =
-    new BankTransferPayment(logger);
-
-if (AppSettings.Instance.EnablePaymentLogging)
+var paymentFactory = new PaymentStrategyFactory(logger);
+var paymentService = new PaymentService(paymentFactory);
+Order order = new Order
 {
-    payPalStrategy =
-        new PaymentLoggingDecorator(
-            payPalStrategy,
-            logger);
-}
+    Id = 1,
+    Total = 100,
+    CustomerEmail = "customer@example.com",
+    PaymentMethod = PaymentMethod.PayPal
+};
 
-payPalStrategy =
-    new PaymentTimingDecorator(
-        logger,
-        payPalStrategy);
-
-
-IEnumerable<IPaymentStrategy> strategies =
-[
-    creditCardStrategy,
-    payPalStrategy,
-    bankTransferStrategy
-];
-
-var paymentService = new PaymentService(strategies);
+var paymentSteps = new List<IPaymentStep>
+{
+    new PaymentValidationStep(),
+    new PaymentExecutionStep(paymentService,order),
+    new PaymentAuditStep(logger)
+};
+var paymentPipeline = new PaymentPipeline(paymentSteps);
 
 var orderService = new OrderService(
     notificationService,
     repository,
-    paymentService,
+    paymentPipeline,
     validator);
 
 var eventPublisher = new OrderEventPublisher();
@@ -69,12 +56,6 @@ processor.ProcessPayment();   // Throws NotSupportedException
 
 
 
-Order order = new Order
-{
-    Id = 1,
-    Total = 100,
-    CustomerEmail = "customer@example.com",
-    PaymentMethod = PaymentMethod.PayPal
-};
-var OrderFacade = new OrderFacade(orderService,eventPublisher);
-OrderFacade.PlaceOrder(order);
+
+var orderFacade = new OrderFacade(orderService,eventPublisher);
+await orderFacade.PlaceOrder(order);
