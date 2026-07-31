@@ -3,5 +3,6 @@
 public enum PaymentMethod
 {
     CreditCard,
-    PayPal
+    PayPal,
+    BankTransfer
 }

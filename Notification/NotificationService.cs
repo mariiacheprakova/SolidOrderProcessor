@@ -1,5 +1,5 @@
 ﻿using SolidOrderProcessor.Models;
-using SolidOrderProcessor.Persistence;
+using SolidOrderProcessor.Logging;
 namespace SolidOrderProcessor.Notification;
 
 public class NotificationService : ISendEmail
