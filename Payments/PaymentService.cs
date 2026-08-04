@@ -1,9 +1,8 @@
-﻿using SolidOrderProcessor.Models;
 using SolidOrderProcessor.Logging;
-namespace SolidOrderProcessor.Payments;
 using SolidOrderProcessor.Models;
+namespace SolidOrderProcessor.Payments;
 
-public class PaymentService 
+public class PaymentService
 {
     private readonly IPaymentStrategyFactory _factory;
     public PaymentService(IPaymentStrategyFactory factory) => _factory = factory;

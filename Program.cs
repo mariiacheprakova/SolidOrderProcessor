@@ -1,4 +1,4 @@
-﻿using SolidOrderProcessor;
+using SolidOrderProcessor;
 using SolidOrderProcessor.Configuration;
 using SolidOrderProcessor.Facades;
 using SolidOrderProcessor.Logging;
@@ -18,8 +18,27 @@ var validator = new OrderValidation();
 var notificationService = new NotificationService(logger);
 var repository = new FileOrderRepository();
 
-var paymentFactory = new PaymentStrategyFactory(logger);
+IPaymentStrategy creditCardStrategy = new CreditCardPayment(logger);
+IPaymentStrategy payPalStrategy = new PayPalPayment(logger);
+IPaymentStrategy bankTransferStrategy = new BankTransferPayment(logger);
+
+if (AppSettings.Instance.EnablePaymentLogging)
+{
+    payPalStrategy = new PaymentLoggingDecorator(payPalStrategy, logger);
+}
+
+payPalStrategy = new PaymentTimingDecorator(logger, payPalStrategy);
+
+IEnumerable<IPaymentStrategy> strategies =
+[
+    creditCardStrategy,
+    payPalStrategy,
+    bankTransferStrategy
+];
+
+IPaymentStrategyFactory paymentFactory = new PaymentStrategyFactory(strategies);
 var paymentService = new PaymentService(paymentFactory);
+
 Order order = new Order
 {
     Id = 1,
