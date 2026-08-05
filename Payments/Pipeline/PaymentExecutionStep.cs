@@ -1,12 +1,11 @@
 ﻿using SolidOrderProcessor.Models;
+using SolidOrderProcessor.Strategies;
 
-namespace SolidOrderProcessor.Payments;
-
+namespace SolidOrderProcessor.Payments.Pipeline;
 public class PaymentExecutionStep : IPaymentStep
 {
     private readonly PaymentService _paymentService;
     private readonly Order _order;
-
     public PaymentExecutionStep(
         PaymentService paymentService,
         Order order)
@@ -14,13 +13,11 @@ public class PaymentExecutionStep : IPaymentStep
         _paymentService = paymentService;
         _order = order;
     }
-
-    public async Task Handle(
+        public async Task Handle(
         decimal amount,
         Func<Task> next)
     {
         _paymentService.ProcessPayment(_order);
-
         await next();
     }
 }

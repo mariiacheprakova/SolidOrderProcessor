@@ -1,12 +1,8 @@
 ﻿using SolidOrderProcessor.Models;
-using System;
-using System.Collections.Generic;
-using System.Text;
+using SolidOrderProcessor.Strategies;
 
-namespace SolidOrderProcessor.Payments;
-
+namespace SolidOrderProcessor.Payments.Factories;
 public interface IPaymentStrategyFactory
 {
     IPaymentStrategy Create(PaymentMethod paymentMethod);
-    
 }

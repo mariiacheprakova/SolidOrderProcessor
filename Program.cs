@@ -5,15 +5,15 @@ using SolidOrderProcessor.Logging;
 using SolidOrderProcessor.Models;
 using SolidOrderProcessor.Notification;
 using SolidOrderProcessor.Observers;
-using SolidOrderProcessor.Payment;
-using SolidOrderProcessor.Payments;
+using SolidOrderProcessor.Payments.Decorators;
+using SolidOrderProcessor.Payments.Factories;
+using SolidOrderProcessor.Payments.Pipeline;
 using SolidOrderProcessor.Persistence;
 using SolidOrderProcessor.Services;
+using SolidOrderProcessor.Strategies;
 using SolidOrderProcessor.Validation;
 
-
 var logger = new ConsoleLogger();
-
 var validator = new OrderValidation();
 var notificationService = new NotificationService(logger);
 var repository = new FileOrderRepository();
@@ -28,7 +28,6 @@ if (AppSettings.Instance.EnablePaymentLogging)
 }
 
 payPalStrategy = new PaymentTimingDecorator(logger, payPalStrategy);
-
 IEnumerable<IPaymentStrategy> strategies =
 [
     creditCardStrategy,
@@ -53,28 +52,21 @@ var paymentSteps = new List<IPaymentStep>
     new PaymentExecutionStep(paymentService,order),
     new PaymentAuditStep(logger)
 };
-var paymentPipeline = new PaymentPipeline(paymentSteps);
-
+IPaymentPipeline paymentPipeline =
+    new PaymentPipeline(paymentSteps);
 var orderService = new OrderService(
     notificationService,
     repository,
     paymentPipeline,
     validator);
-
 var eventPublisher = new OrderEventPublisher();
 eventPublisher.Subscribe(new EmailNotifier(logger));
 eventPublisher.Subscribe(new AuditLogger(logger));
 
-
 //BAD LSP EXAMPLE
 PaymentProcessor processor = new RevolutProcessor(logger);
 processor.ProcessPayment();   // Works
-
 processor = new BrokenPaymentProcessor(logger);
 processor.ProcessPayment();   // Throws NotSupportedException
-
-
-
-
 var orderFacade = new OrderFacade(orderService,eventPublisher);
 await orderFacade.PlaceOrder(order);

@@ -1,22 +1,20 @@
 ﻿using SolidOrderProcessor.Models;
 using SolidOrderProcessor.Notification;
-using SolidOrderProcessor.Payments;
+using SolidOrderProcessor.Payments.Pipeline;
 using SolidOrderProcessor.Persistence;
 using SolidOrderProcessor.Validation;
 
 namespace SolidOrderProcessor.Services;
-
 public class OrderService
 {
     private readonly ISendEmail _notificationService;
     private readonly IOrderRepository _orderRepository;
-    private readonly PaymentPipeline _paymentPipeline;
+    private readonly IPaymentPipeline _paymentPipeline;
     private readonly IOrderValidator _orderValidator;
-
     public OrderService(
         ISendEmail notificationService,
         IOrderRepository orderRepository,
-        PaymentPipeline paymentPipeline,
+        IPaymentPipeline paymentPipeline,
         IOrderValidator orderValidator)
     {
         _notificationService = notificationService;
@@ -24,7 +22,6 @@ public class OrderService
         _paymentPipeline = paymentPipeline;
         _orderValidator = orderValidator;
     }
-
     public async Task ProcessOrder(Order order)
     {
         _orderValidator.ValidateCustomerOrder(order);
