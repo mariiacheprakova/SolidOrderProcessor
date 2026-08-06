@@ -1,7 +1,8 @@
 ﻿using SolidOrderProcessor.Logging;
 using SolidOrderProcessor.Models;
+using SolidOrderProcessor.Strategies;
 
-namespace SolidOrderProcessor.Strategies;
+namespace SolidOrderProcessor.Payments.Strategies;
 public class PayPalPayment : IPaymentStrategy
 {
     private readonly ILogger _logger;

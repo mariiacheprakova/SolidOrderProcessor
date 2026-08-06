@@ -1,7 +1,7 @@
 ﻿namespace SolidOrderProcessor.Payments.Pipeline;
 public class PaymentValidationStep : IPaymentStep
 {
-    public async Task Handle(decimal amount, Func<Task> next)
+    public async Task HandleAsync(decimal amount, Func<Task> next)
     {
         if (amount <= 0)
         {

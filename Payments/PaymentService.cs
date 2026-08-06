@@ -1,7 +1,8 @@
 using SolidOrderProcessor.Models;
 using SolidOrderProcessor.Payments.Factories;
+using SolidOrderProcessor.Strategies;
 
-namespace SolidOrderProcessor.Strategies;
+namespace SolidOrderProcessor.Payments;
 public class PaymentService
 {
     private readonly IPaymentStrategyFactory _factory;

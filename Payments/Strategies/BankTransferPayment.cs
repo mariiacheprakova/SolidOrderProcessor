@@ -1,8 +1,8 @@
 ﻿using SolidOrderProcessor.Models;
 using SolidOrderProcessor.Logging;
-using SolidOrderProcessor.Payments;
+using SolidOrderProcessor.Strategies;
 
-namespace SolidOrderProcessor.Strategies;
+namespace SolidOrderProcessor.Payments.Strategies;
 public class BankTransferPayment : IPaymentStrategy
 {
     private readonly ILogger _logger;

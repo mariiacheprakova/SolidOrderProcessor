@@ -13,7 +13,7 @@ public class PaymentExecutionStep : IPaymentStep
         _paymentService = paymentService;
         _order = order;
     }
-        public async Task Handle(
+        public async Task HandleAsync(
         decimal amount,
         Func<Task> next)
     {

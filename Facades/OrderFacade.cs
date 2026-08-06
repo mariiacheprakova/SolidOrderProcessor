@@ -13,7 +13,7 @@ public class OrderFacade
         _orderService = orderService;
         _orderEventPublisher = orderEventPublisher;
     }
-    public async Task PlaceOrder(Order order)
+    public async Task PlaceOrderAsync(Order order)
     {
         await _orderService.ProcessOrder(order);
         _orderEventPublisher.PublishOrderPlaced(order);

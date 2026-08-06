@@ -22,7 +22,7 @@ public class OrderService
         _paymentPipeline = paymentPipeline;
         _orderValidator = orderValidator;
     }
-    public async Task ProcessOrder(Order order)
+    public async Task ProcessOrderAsync(Order order)
     {
         _orderValidator.ValidateCustomerOrder(order);
         await _paymentPipeline.Execute(order.Total);
