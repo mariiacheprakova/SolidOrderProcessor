@@ -1,22 +1,15 @@
-﻿using SolidOrderProcessor.Factories;
-using SolidOrderProcessor.Logging;
 using SolidOrderProcessor.Models;
-namespace SolidOrderProcessor.Payments;
+using SolidOrderProcessor.Payments.Factories;
+using SolidOrderProcessor.Strategies;
 
+namespace SolidOrderProcessor.Payments;
 public class PaymentService
 {
     private readonly IPaymentStrategyFactory _factory;
-
-    public PaymentService(IPaymentStrategyFactory factory)
-    {
-        _factory = factory;
-    }
-
+    public PaymentService(IPaymentStrategyFactory factory) => _factory = factory;
     public void ProcessPayment(Order order)
     {
-        IPaymentStrategy strategy =
-            _factory.Create(order.PaymentMethod);
-
+        IPaymentStrategy strategy = _factory.Create(order.PaymentMethod);
         strategy.Pay(order);
     }
 }

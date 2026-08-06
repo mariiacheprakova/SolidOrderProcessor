@@ -1,34 +1,31 @@
 ﻿using SolidOrderProcessor.Models;
 using SolidOrderProcessor.Notification;
-using SolidOrderProcessor.Payments;
+using SolidOrderProcessor.Payments.Pipeline;
 using SolidOrderProcessor.Persistence;
 using SolidOrderProcessor.Validation;
 
 namespace SolidOrderProcessor.Services;
-
 public class OrderService
 {
     private readonly ISendEmail _notificationService;
     private readonly IOrderRepository _orderRepository;
-    private readonly PaymentService _paymentService;
+    private readonly IPaymentPipeline _paymentPipeline;
     private readonly IOrderValidator _orderValidator;
-
     public OrderService(
         ISendEmail notificationService,
         IOrderRepository orderRepository,
-        PaymentService paymentService,
+        IPaymentPipeline paymentPipeline,
         IOrderValidator orderValidator)
     {
         _notificationService = notificationService;
         _orderRepository = orderRepository;
-        _paymentService = paymentService;
+        _paymentPipeline = paymentPipeline;
         _orderValidator = orderValidator;
     }
-
-    public void ProcessOrder(Order order)
+    public async Task ProcessOrderAsync(Order order)
     {
         _orderValidator.ValidateCustomerOrder(order);
-        _paymentService.ProcessPayment(order);
+        await _paymentPipeline.Execute(order.Total);
         _notificationService.SendingEmailToCustomer(order);
         _orderRepository.Save(order);
     }

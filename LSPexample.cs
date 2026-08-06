@@ -1,10 +1,6 @@
 ﻿using SolidOrderProcessor.Logging;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace SolidOrderProcessor;
-
 public abstract class PaymentProcessor
 {
     protected readonly ILogger Logger;
@@ -14,7 +10,6 @@ public abstract class PaymentProcessor
     }
     public abstract void ProcessPayment();
 }
-
 public class RevolutProcessor : PaymentProcessor
 {
     public RevolutProcessor(ILogger logger) : base(logger) { }
@@ -23,7 +18,6 @@ public class RevolutProcessor : PaymentProcessor
         Logger.Log("Payment by Revolu processed.");
     }
 }
-
 public class BrokenPaymentProcessor : PaymentProcessor
 {
     public BrokenPaymentProcessor(ILogger logger) : base(logger) { }
@@ -32,7 +26,6 @@ public class BrokenPaymentProcessor : PaymentProcessor
         //throw new NotSupportedException(
         //    "This payment processor cannot process payments.");
         Logger.Log("An exception will be implemented here.");
-
     }
 }
 

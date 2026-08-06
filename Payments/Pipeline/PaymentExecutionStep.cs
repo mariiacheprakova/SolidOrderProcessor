@@ -1,0 +1,23 @@
+﻿using SolidOrderProcessor.Models;
+using SolidOrderProcessor.Strategies;
+
+namespace SolidOrderProcessor.Payments.Pipeline;
+public class PaymentExecutionStep : IPaymentStep
+{
+    private readonly PaymentService _paymentService;
+    private readonly Order _order;
+    public PaymentExecutionStep(
+        PaymentService paymentService,
+        Order order)
+    {
+        _paymentService = paymentService;
+        _order = order;
+    }
+        public async Task HandleAsync(
+        decimal amount,
+        Func<Task> next)
+    {
+        _paymentService.ProcessPayment(_order);
+        await next();
+    }
+}

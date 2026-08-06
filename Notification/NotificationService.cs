@@ -1,7 +1,6 @@
 ﻿using SolidOrderProcessor.Models;
 using SolidOrderProcessor.Logging;
 namespace SolidOrderProcessor.Notification;
-
 public class NotificationService : ISendEmail
 {
     private readonly ILogger _logger;

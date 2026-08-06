@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net.Http.Headers;
-using System.Text;
-using SolidOrderProcessor.Models;
+﻿using SolidOrderProcessor.Models;
 
 namespace SolidOrderProcessor.Validation;
-
 public class OrderValidation : IOrderValidator
 {
     public void ValidateCustomerOrder(Order order)
@@ -19,6 +14,5 @@ public class OrderValidation : IOrderValidator
         {
             throw new Exception("Invalid total");
         }
-
     }
 }

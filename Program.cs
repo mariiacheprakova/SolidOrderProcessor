@@ -1,99 +1,72 @@
-﻿using SolidOrderProcessor;
+using SolidOrderProcessor;
 using SolidOrderProcessor.Configuration;
 using SolidOrderProcessor.Facades;
-using SolidOrderProcessor.Factories;
 using SolidOrderProcessor.Logging;
 using SolidOrderProcessor.Models;
 using SolidOrderProcessor.Notification;
 using SolidOrderProcessor.Observers;
-using SolidOrderProcessor.Payments;
+using SolidOrderProcessor.Payments.Decorators;
+using SolidOrderProcessor.Payments.Factories;
+using SolidOrderProcessor.Payments.Pipeline;
 using SolidOrderProcessor.Persistence;
 using SolidOrderProcessor.Services;
+using SolidOrderProcessor.Strategies;
 using SolidOrderProcessor.Validation;
 
-class Program
+var logger = new ConsoleLogger();
+var validator = new OrderValidation();
+var notificationService = new NotificationService(logger);
+var repository = new FileOrderRepository();
+
+IPaymentStrategy creditCardStrategy = new CreditCardPayment(logger);
+IPaymentStrategy payPalStrategy = new PayPalPayment(logger);
+IPaymentStrategy bankTransferStrategy = new BankTransferPayment(logger);
+
+if (AppSettings.Instance.EnablePaymentLogging)
 {
-    static void Main(string[] args)
-    {
-        var logger = new ConsoleLogger();
-
-        var validator = new OrderValidation();
-        var notificationService = new NotificationService(logger);
-        var repository = new FileOrderRepository();
-
-        IPaymentStrategy creditCardStrategy =
-            new CreditCardPayment(logger);
-
-        IPaymentStrategy payPalStrategy =
-            new PayPalPayment(logger);
-
-        IPaymentStrategy bankTransferStrategy =
-            new BankTransferPayment(logger);
-
-        if (AppSettings.Instance.EnablePaymentLogging)
-        {
-            payPalStrategy =
-                new PaymentLoggingDecorator(
-                    payPalStrategy,
-                    logger);
-        }
-
-        payPalStrategy =
-            new PaymentTimingDecorator(
-                logger,
-                payPalStrategy);
-
-        IEnumerable<IPaymentStrategy> strategies =
-        [
-            creditCardStrategy,
-            payPalStrategy,
-            bankTransferStrategy
-        ];
-
-        IPaymentStrategyFactory paymentStrategyFactory =
-            new PaymentStrategyFactory(strategies);
-
-        var paymentService =
-            new PaymentService(paymentStrategyFactory);
-
-        var orderService = new OrderService(
-            notificationService,
-            repository,
-            paymentService,
-            validator);
-
-        var eventPublisher = new OrderEventPublisher();
-
-        eventPublisher.Subscribe(
-            new EmailNotifier(logger));
-
-        eventPublisher.Subscribe(
-            new AuditLogger(logger));
-
-        Order order = new Order
-        {
-            Id = 1,
-            Total = 100,
-            CustomerEmail = "customer@example.com",
-            PaymentMethod = PaymentMethod.PayPal
-        };
-
-        var orderFacade =
-            new OrderFacade(
-                orderService,
-                eventPublisher);
-
-        orderFacade.PlaceOrder(order);
-
-        // BAD LSP EXAMPLE
-        PaymentProcessor processor =
-            new RevolutProcessor(logger);
-
-        processor.ProcessPayment();
-
-        processor =
-            new BrokenPaymentProcessor(logger);
-
-        processor.ProcessPayment();
-    }
+    payPalStrategy = new PaymentLoggingDecorator(payPalStrategy, logger);
 }
+
+payPalStrategy = new PaymentTimingDecorator(logger, payPalStrategy);
+IEnumerable<IPaymentStrategy> strategies =
+[
+    creditCardStrategy,
+    payPalStrategy,
+    bankTransferStrategy
+];
+
+IPaymentStrategyFactory paymentFactory = new PaymentStrategyFactory(strategies);
+var paymentService = new PaymentService(paymentFactory);
+
+Order order = new Order
+{
+    Id = 1,
+    Total = 100,
+    CustomerEmail = "customer@example.com",
+    PaymentMethod = PaymentMethod.PayPal
+};
+
+var paymentSteps = new List<IPaymentStep>
+{
+    new PaymentValidationStep(),
+    new PaymentExecutionStep(paymentService,order),
+    new PaymentAuditStep(logger)
+};
+IPaymentPipeline paymentPipeline =
+    new PaymentPipeline(paymentSteps);
+var orderService = new OrderService(
+    notificationService,
+    repository,
+    paymentPipeline,
+    validator);
+var eventPublisher = new OrderEventPublisher();
+eventPublisher.Subscribe(new EmailNotifier(logger));
+eventPublisher.Subscribe(new AuditLogger(logger));
+
+//BAD LSP EXAMPLE
+PaymentProcessor processor = new RevolutProcessor(logger);
+processor.ProcessPayment();   // Works
+processor = new BrokenPaymentProcessor(logger);
+processor.ProcessPayment();   // Throws NotSupportedException
+var orderFacade = new OrderFacade(orderService,eventPublisher);
+await orderFacade.PlaceOrder(order);
